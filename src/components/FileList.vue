@@ -86,9 +86,11 @@ export default {
     },
     exec(name, key, server) {
       let _this = this;
-      let url = "file/execBat/" + name + "/" + server;
       this.spinConfig.spinning = true;
-      this.$http.post(url).then(function () {
+      this.$http.post("file/execBat", {
+        name: name,
+        server: server
+      }).then(function () {
         _this.spinConfig.spinning = false;
         return;
       });

@@ -185,6 +185,9 @@ export default {
     databaseSelectChange(value) {
       let _this = this;
       this.$http.get("data/getPoolByName/" + value).then(function (res) {
+        if(!res){
+          return;
+        }
         _this.form.setFieldsValue({
           databaseDriver: "MSSQL",
           name: value,
@@ -202,6 +205,9 @@ export default {
       let _this = this;
       this.databases = [];
       this.$http.get("data/allConnect").then(function (res) {
+        if(!res){
+          return;
+        }
         let data = JSON.parse(res);
         data.forEach((s) => _this.databases.push(s));
       });

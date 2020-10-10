@@ -8,13 +8,13 @@ const routes = [
   {
     name: 'login',
     path: '/login',
+    alias: '/',
     component: () => import('../views/Login.vue')
   },
   {
     name: 'index',
     path: '/index',
-    alias: '/',
-    redirect: '/init',
+    redirect: '/filelist',
     children: [
       {
         name: 'init',
@@ -30,6 +30,11 @@ const routes = [
         name: 'datasourcelist',
         path: '/datasourcelist',
         component: () => import('../components/DataSourceList.vue')
+      },
+      {
+        name: 'manage',
+        path: '/manage',
+        component: () => import('../components/DataSourceManage.vue')
       },
     ],
     component: () => import('../views/Index.vue')
@@ -49,21 +54,18 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   let token = sessionStorage.getItem("Authorization");
-  if (to.name != "login") {
-    if (null != token && token.length != 0) {
-      next();
-    } else {
-      message.error("请登录！", 3);
-      next({ name: "login" });
-    }
-  } else {
-    if (null != token && token.length != 0) {
-      next({ name: "index" });
-    } else {
-      next();
-    }
+  if(to.name == 'login'){
+    next();
+    return;
   }
-
+  if (null != token && token.length != 0) {
+    next();
+    return;
+  } else {
+    message.error("请登录！", 3);
+    next({ name: "login" });
+    return;
+  }
 })
 
 export default router

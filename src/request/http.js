@@ -5,8 +5,8 @@ import router from '../router'
 
 // 创建一个axios对象
 const request = axios.create({
-    //baseURL: '/api-kettle/',   // 基础路径，会自动添加到你请求url前面
-    baseURL: '/api/',   // 基础路径，会自动添加到你请求url前面
+    baseURL: '/api-kettle/',   // 基础路径，会自动添加到你请求url前面
+    //baseURL: '/api/',   // 基础路径，会自动添加到你请求url前面
     timeout: 10000   // 请求超时，10000毫秒
 })
 
@@ -18,15 +18,16 @@ request.interceptors.request.use(
         //config.data = JSON.stringify(config.data);
         config.headers = {
             'Content-Type': 'application/json;charset=utf-8',
-            'Access-Control-Allow-Origin': 'http://localhost:6989',
-            'Access-Control-Allow-Credentials': 'true',
+            //'Access-Control-Allow-Origin': 'http://localhost:6989',
+            //'Access-Control-Allow-Credentials': 'true',
             'Authorization': "Bearer " + sessionStorage.getItem('Authorization')
         }
         return config;
     },
     error => {
         message.error("网络链接异常", 3);
-        return Promise.resolve(error);
+        console.log(Promise.resolve(error))
+        return false;
     }
 );
 
@@ -34,42 +35,43 @@ request.interceptors.request.use(
 request.interceptors.response.use(response => {
     // 在2xx范围内的任何状态代码都会触发此功能
     // 处理响应数据
-    let flag = true;
-    if (response == null || response.data.status == 'error') {
-        message.error("数据异常", 3)
-        return null;
-    }
+    let flag = false;
     switch (response.data.statusCode) {
         case "00000":
-            flag = false;
+            message.success(response.data.msg, 3)
+            if (null == response.data.data) {
+                response.data.data = true;
+            }
             break;
         case "A0230":
-            sessionStorage.clear();
-            router.push("/login");
+            flag = true;
             break;
         case "A0220":
-            sessionStorage.clear();
+            flag = true;
             break;
+        case "A0320":
+            flag = true;
+            break;
+        default:
+            message.error(response.data.msg, 3)
+            response.data.data = false;
     }
     if (flag) {
         message.error(response.data.msg, 3)
-        //false
-        response.data.data = null;
-    } else {
-        message.success(response.data.msg, 3)
-        if (null == response.data.data) {
-            response.data.data = true;
-        }
+        sessionStorage.clear();
+        router.push("/login");
+        return false;
     }
     if (response.headers.authorization != null) {
         sessionStorage.setItem('Authorization', response.headers.authorization)
     }
     return response.data.data;
-}, function (error) {
+}, error => {
     // 任何超出2xx范围的状态代码都会触发此功能
     // 处理响应错误
-    message.error("网络链接异常", 3);
-    return Promise.resolve(error);
+    message.error("异常", 3);
+    console.log(Promise.resolve(error));
+    return false;
 });
 
 

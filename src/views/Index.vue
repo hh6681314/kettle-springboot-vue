@@ -14,7 +14,9 @@
         </a-menu>
       </a-layout-sider>
       <a-layout>
-        <a-layout-header style="background: #e0eee8; padding: 0" />
+        <a-layout-header style="background: #e0eee8; padding: 0">
+          <a style="float: right" @click="logout">Logout</a>
+        </a-layout-header>
         <a-layout-content style="margin: 0 16px">
           <a-breadcrumb style="margin: 16px 0"> </a-breadcrumb>
           <div
@@ -40,7 +42,7 @@ export default {
       menus: [
         {
           key: "filelist",
-          value: "Kettle List File",
+          value: "Kettle File List",
         },
         {
           key: "init",
@@ -50,8 +52,12 @@ export default {
           key: "datasourcelist",
           value: "DataSource Control",
         },
+        {
+          key: "manage",
+          value: "DataSource Manage",
+        },
       ],
-      icons: ["profile", "api", "tool"],
+      icons: ["profile", "api", "tool", "database"],
       menuSelect: [],
     };
   },
@@ -66,6 +72,20 @@ export default {
     },
     init() {
       this.menuSelect = [this.$route.name];
+    },
+    logout() {
+      let _this = this;
+      this.$http
+        .post("auth/logout")
+        .then(function (res) {
+          if (!res) {
+            _this.$message.error(res, 3);
+            return;
+          }
+          _this.$message.success("成功退出登录!", 3);
+          sessionStorage.clear();
+          _this.$router.push({ name: "login" });
+        });
     },
   },
 };

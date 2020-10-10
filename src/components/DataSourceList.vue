@@ -56,7 +56,7 @@ import debounce from "lodash/debounce";
 export default {
   data() {
     this.lastFetchId = 0;
-    this.fetchUser = debounce(this.fetchUser, 500);
+    this.fetchUser = debounce(this.fetchUser, 300);
     return {
       options: [],
       listLoading: true,
@@ -72,6 +72,7 @@ export default {
       textAreaStatus: false,
       textAreaValue: "",
       buttonStatus: true,
+      count: 0,
 
     };
   },
@@ -103,6 +104,10 @@ export default {
       }
     },
     loadSeacrchData() {
+      if(this.count > 2){
+        return;
+      }
+      this.count++;
       let _this = this;
       this.$http
         .get(
@@ -151,6 +156,9 @@ export default {
             this.form.value
         )
         .then(function (res) {
+          if (!res) {
+            return;
+          }
           let sql = "";
           JSON.parse(res).forEach(s => sql += (s + ";\n"))
           _this.textAreaValue = sql;
@@ -177,6 +185,9 @@ export default {
             value
         )
         .then(function (res) {
+          if (!res) {
+            return;
+          }
           let all = JSON.parse(res);
           _this.searchData = all;
           _this.fetching = false;

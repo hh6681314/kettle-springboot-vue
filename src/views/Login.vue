@@ -111,6 +111,7 @@ export default {
     };
   },
   beforeCreate: function () {
+    sessionStorage.clear();
     this.form = this.$form.createForm(this, { name: "normal_login" });
   },
   methods: {
@@ -136,17 +137,20 @@ export default {
               if (res) {
                 sessionStorage.setItem("Authorization", res);
                 _this.$router.push("/Index");
+              } else {
+                sessionStorage.clear();
+                _this.formData.password = "";
               }
             });
         }
       });
     },
     forget() {
-      this.$message.error("功能未实现");
+      this.$message.warn("功能未实现");
       return;
     },
     register() {
-      this.$message.error("功能未实现");
+      this.$message.warn("功能未实现");
       return;
     },
   },
